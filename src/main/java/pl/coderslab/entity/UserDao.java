@@ -10,6 +10,8 @@ import java.sql.SQLException;
 public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
     private static final String READ_USER_QUERY = "SELECT * FROM users WHERE id = ?";
+    private static final String READ_ALL_USERS_QUERY = "SELECT * FROM users";
+//    is this proper way to split line?
     private static final String UPDATE_USER_QUERY =
             "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?";
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
@@ -31,5 +33,24 @@ public class UserDao {
             e.printStackTrace();
             return null;
         }
+    }
+
+
+    public User read(int userId) {
+        User resultUser = new User();
+
+        try (Connection conn = DbUtil.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(READ_USER_QUERY);
+            stmt.setInt(1, userId);
+            ResultSet resultSet = stmt.executeQuery();
+            resultSet.next();
+            resultUser.setId(resultSet.getInt("id"));
+            resultUser.setEmail(resultSet.getString("email"));
+            resultUser.setUserName(resultSet.getString("username"));
+            resultUser.setPassword(resultSet.getString("password"));
+        } catch (SQLException e) {
+            return null;
+        }
+        return resultUser;
     }
 }
