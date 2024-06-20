@@ -42,13 +42,16 @@ public class UserDao {
             PreparedStatement stmt = conn.prepareStatement(READ_USER_QUERY);
             stmt.setInt(1, userId);
             ResultSet resultSet = stmt.executeQuery();
-            resultSet.next();
-            resultUser.setId(resultSet.getInt("id"));
-            resultUser.setEmail(resultSet.getString("email"));
-            resultUser.setUserName(resultSet.getString("username"));
-            resultUser.setPassword(resultSet.getString("password"));
+            if (resultSet.next()) {
+                resultUser.setId(resultSet.getInt("id"));
+                resultUser.setEmail(resultSet.getString("email"));
+                resultUser.setUserName(resultSet.getString("username"));
+                resultUser.setPassword(resultSet.getString("password"));
+            } else {
+                return null;
+            }
         } catch (SQLException e) {
-            return null;
+            throw new RuntimeException();
         }
         return resultUser;
     }
