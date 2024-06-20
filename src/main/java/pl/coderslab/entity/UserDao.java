@@ -3,10 +3,7 @@ package pl.coderslab.entity;
 import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.DbUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
@@ -27,11 +24,13 @@ public class UserDao {
             if (resultSet.next()) {
                 user.setId(resultSet.getInt(1));
             }
-            return user;
-        } catch (SQLException e) {
+        } catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
             return null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return user;
     }
 
 
@@ -51,7 +50,7 @@ public class UserDao {
                 return null;
             }
         } catch (SQLException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
         return resultUser;
     }
