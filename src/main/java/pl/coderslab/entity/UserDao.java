@@ -1,5 +1,6 @@
 package pl.coderslab.entity;
 
+import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.DbUtil;
 
 import java.sql.Connection;
@@ -22,7 +23,7 @@ public class UserDao {
             PreparedStatement stmt = conn.prepareStatement(CREATE_USER_QUERY, PreparedStatement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getUserName());
             stmt.setString(2, user.getEmail());
-            stmt.setString(3, user.getPassword());
+            stmt.setString(3, hashPassword(user.getPassword()));
             stmt.executeUpdate();
             ResultSet resultSet = stmt.getGeneratedKeys();
             if (resultSet.next()) {
@@ -52,5 +53,9 @@ public class UserDao {
             return null;
         }
         return resultUser;
+    }
+
+    private static String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }
