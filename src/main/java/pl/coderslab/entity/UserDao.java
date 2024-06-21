@@ -55,6 +55,36 @@ public class UserDao {
         return resultUser;
     }
 
+    public void update(User newUser) {
+        User currentUser = read(newUser.getId());
+        String currentUserPassword = currentUser.getPassword();
+        String newUserPassword = newUser.getPassword();
+
+        try (Connection conn = DbUtil.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(UPDATE_USER_QUERY);
+            stmt.setString(1, newUser.getUserName());
+            stmt.setString(2, newUser.getEmail());
+            if (!currentUserPassword.equals(newUserPassword) && (!BCrypt.checkpw(newUserPassword, currentUserPassword))) {
+                stmt.setString(3, hashPassword(newUserPassword));
+            } else {
+                stmt.setString(3,currentUserPassword);
+            }
+            stmt.setInt(4, newUser.getId());
+
+            if (stmt.executeUpdate() == 1) {
+                User updatedUser = read(newUser.getId());
+                newUser.setUserName(updatedUser.getUserName());
+                newUser.setEmail(updatedUser.getEmail());
+                newUser.setPassword(updatedUser.getPassword());
+            }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.err.println("Update failure - `users` entity remains unchanged.");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
