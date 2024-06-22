@@ -25,6 +25,7 @@ public class UserDao {
                 user.setId(resultSet.getInt(1));
             }
         } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Database constraint violation. User creation failure -  entity was not created");
             e.printStackTrace();
             return null;
         } catch (SQLException e) {
@@ -78,7 +79,7 @@ public class UserDao {
                 newUser.setPassword(updatedUser.getPassword());
             }
         } catch (SQLIntegrityConstraintViolationException e) {
-            System.err.println("Update failure - `users` entity remains unchanged.");
+            System.out.println("Database constraint violation. Update failure - `users` entity remains unchanged.");
             e.printStackTrace();
         } catch (SQLException e) {
             throw new RuntimeException(e);
