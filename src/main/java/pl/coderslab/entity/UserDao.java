@@ -90,6 +90,16 @@ public class UserDao {
         }
     }
 
+    public void delete(int userId) {
+        try(Connection conn = DbUtil.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(DELETE_USER_QUERY);
+            stmt.setInt(1, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
