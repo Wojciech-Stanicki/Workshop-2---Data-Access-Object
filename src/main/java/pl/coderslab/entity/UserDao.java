@@ -23,6 +23,10 @@ public class UserDao {
             ResultSet resultSet = stmt.getGeneratedKeys();
             if (resultSet.next()) {
                 user.setId(resultSet.getInt(1));
+                User updatedUser = read(user.getId());
+                user.setUserName(updatedUser.getUserName());
+                user.setEmail(updatedUser.getEmail());
+                user.setPassword(updatedUser.getPassword());
             }
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("Database constraint violation. User creation failure -  entity was not created");
