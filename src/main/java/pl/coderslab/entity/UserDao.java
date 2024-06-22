@@ -4,6 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import pl.coderslab.DbUtil;
 
 import java.sql.*;
+import java.util.Arrays;
 
 public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
@@ -100,7 +101,32 @@ public class UserDao {
         }
     }
 
+    public User[] findAll() {
+        User[] resultUsers = new User[0];
+        try(Connection conn = DbUtil.connect()) {
+            PreparedStatement stmt = conn.prepareStatement(READ_ALL_USERS_QUERY);
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                User user = new User();
+                user.setId(resultSet.getInt("id"));
+                user.setEmail(resultSet.getString("email"));
+                user.setUserName(resultSet.getString("username"));
+                user.setPassword(resultSet.getString("password"));
+                resultUsers = addToArray(user,resultUsers);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return resultUsers;
+    }
+
     private static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    private User[] addToArray(User userToAdd, User[] currentUsers) {
+        User[] resultUsers = Arrays.copyOf(currentUsers, currentUsers.length + 1);
+        resultUsers[currentUsers.length] = userToAdd;
+        return resultUsers;
     }
 }
