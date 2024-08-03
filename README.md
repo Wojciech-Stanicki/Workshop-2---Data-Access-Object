@@ -1,4 +1,4 @@
-# Workshop-2---Data-Access-Object
+# Data Access Object
 
 My own implementation of a Data Access Object design pattern
 
